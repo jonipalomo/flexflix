@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consulta de Credenciales - 4to 1ra</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .header h1 {
+      color: #fff;
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .header p {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.9rem;
+      margin-top: 6px;
+    }
+
+    .search-card {
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 32px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    input::placeholder { color: rgba(255,255,255,0.3); }
+
+    input:focus {
+      border-color: #7c6aff;
+      background: rgba(124, 106, 255, 0.1);
+      box-shadow: 0 0 0 3px rgba(124, 106, 255, 0.2);
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #7c6aff, #a855f7);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 8px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(124, 106, 255, 0.5);
+    }
+
+    button:active { transform: translateY(0); }
+
+    .result-section {
+      margin-top: 24px;
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .result-section.show { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .alumno-header {
+      color: #a78bfa;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .alumno-fullname {
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .credential-block {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(124, 106, 255, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+
+    .credential-block-title {
+      color: rgba(255,255,255,0.4);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+    }
+
+    .credential-item {
+      margin-bottom: 12px;
+    }
+
+    .credential-label {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 5px;
+    }
+
+    .credential-value {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+
+    .credential-value span {
+      color: #fff;
+      font-size: 0.88rem;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.3px;
+      word-break: break-all;
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      color: #7c6aff;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      font-size: 0.72rem;
+      font-weight: 700;
+      width: auto;
+      margin-top: 0;
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+
+    .copy-btn:hover {
+      background: rgba(124, 106, 255, 0.2);
+      transform: none;
+      box-shadow: none;
+    }
+
+    .error-msg {
+      margin-top: 16px;
+      padding: 14px 18px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 12px;
+      color: #fca5a5;
+      font-size: 0.9rem;
+      text-align: center;
+      display: none;
+    }
+
+    .error-msg.show { display: block; animation: fadeIn 0.3s ease; }
+
+    .badge {
+      display: inline-block;
+      background: rgba(124, 106, 255, 0.2);
+      color: #a78bfa;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Portal FutureFab <span class="badge">4to 1ra</span></h1>
+      <p>Ingresá tu DNI y apellido para ver tus credenciales</p>
+    </div>
+
+    <div class="search-card">
+      <div class="form-group">
+        <label>DNI</label>
+        <input type="text" id="dniInput" placeholder="Ej: 50293406" maxlength="10" inputmode="numeric">
+      </div>
+      <div class="form-group">
+        <label>Apellido</label>
+        <input type="text" id="apellidoInput" placeholder="Ej: Amoros" maxlength="50">
+      </div>
+      <button onclick="buscar()">Buscar mis credenciales</button>
+
+      <div class="error-msg" id="errorMsg"></div>
+
+      <div class="result-section" id="resultSection">
+        <div style="margin-bottom: 16px;">
+          <div class="alumno-header">Alumno</div>
+          <div class="alumno-fullname" id="alumnoNombre"></div>
+        </div>
+        <div id="credentialsContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const alumnos = [
+      { dni: "50293406", apellido: "AMOROS",           nombre: "MILAGROS",           usuario: "mamoros5029@mendoza.edu.ar",           pass: "mi50am29" },
+      { dni: "50293406", apellido: "AMOROS PADILLA",   nombre: "MILAGROS SOLEDAD",   usuario: "milagrosamoros3406@mendoza.edu.ar",    pass: "mi29am06" },
+      { dni: "50293406", apellido: "Amoros",           nombre: "Milagros",           usuario: "milagrosamoros812@gmail.com",          pass: "am3505mi" },
+      { dni: "49922280", apellido: "BALDERRAMA",       nombre: "JEREMIAS",           usuario: "jbalderrama4992@mendoza.edu.ar",       pass: "je49ba92" },
+      { dni: "49922280", apellido: "BALDERRAMA",       nombre: "JEREMIAS EZEQUIEL",  usuario: "jeremiasbalderrama2280@mendoza.edu.ar",pass: "je92ba80" },
+      { dni: "49922280", apellido: "Balderrama",       nombre: "Ezequiel",           usuario: "balderramaezequiel6@gmail.com",        pass: "ba5245ez" },
+      { dni: "49334802", apellido: "BRAVO",            nombre: "DÉBORA",             usuario: "dbravo4933@mendoza.edu.ar",            pass: "de49br33" },
+      { dni: "49334802", apellido: "BRAVO",            nombre: "DÉBORA NOEMÍ",       usuario: "deborabravo4802@mendoza.edu.ar",       pass: "de33br02" },
+      { dni: "49334802", apellido: "Debora",           nombre: "Bravo",              usuario: "debobravo3@gmail.com",                pass: "de8302br" },
+      { dni: "49181890", apellido: "Cari",             nombre: "Diego",              usuario: "cari.jrd10@gmail.com",                pass: "ca5980di" },
+      { dni: "49990356", apellido: "CASTELLANO",       nombre: "BIANCA",             usuario: "bcastellano4999@mendoza.edu.ar",       pass: "bi49ca99" },
+      { dni: "49990356", apellido: "CASTELLANO PAEZ",  nombre: "BIANCA MORENA",      usuario: "biancacastellano0356@mendoza.edu.ar",  pass: "bi99ca56" },
+      { dni: "49990356", apellido: "Castellano",       nombre: "Morena",             usuario: "morepaez632@gmail.com",               pass: "ca5433mo" },
+      { dni: "50293455", apellido: "CORNEJO",          nombre: "KIARA",              usuario: "kcornejo5029@mendoza.edu.ar",          pass: "ki50co29" },
+      { dni: "50293455", apellido: "CORNEJO ROJAS",    nombre: "KIARA JAZMÍN",       usuario: "kiaracornejo3455@mendoza.edu.ar",      pass: "ki29co55" },
+      { dni: "50293455", apellido: "Cornejo",          nombre: "Kiara",              usuario: "kiaracornejo890@gmail.com",           pass: "co6975ki" },
+      { dni: "49082477", apellido: "DOMINGUEZ",        nombre: "ORNELA",             usuario: "odominguez4908@mendoza.edu.ar",        pass: "or49do08" },
+      { dni: "49082477", apellido: "DOMINGUEZ MONTOYA",nombre: "ORNELA VICTORIA",    usuario: "orneladominguez2477@mendoza.edu.ar",   pass: "or08do77" },
+      { dni: "49082477", apellido: "Dominguez",        nombre: "Ornela",             usuario: "orneldom.0900@gmail.com",             pass: "do3144or" },
+      { dni: "49990305", apellido: "GALVAN",           nombre: "MELANIE",            usuario: "mgalvan4999@mendoza.edu.ar",           pass: "me49ga99" },
+      { dni: "49990305", apellido: "GALVAN HUANCA",    nombre: "MELANIE ANAHí",      usuario: "melaniegalvan0305@mendoza.edu.ar",     pass: "me99ga05" },
+      { dni: "49990305", apellido: "Galvan",           nombre: "Melanie",            usuario: "yuyuuh.mm31@gmail.com",               pass: "ga1916me" },
+      { dni: "50293461", apellido: "GASPAR",           nombre: "ABIGAIL",            usuario: "agaspar5029@mendoza.edu.ar",           pass: "ab50ga29" },
+      { dni: "50293461", apellido: "GASPAR LLANOS",    nombre: "ABIGAIL MELANIE",    usuario: "abigailgaspar3461@mendoza.edu.ar",     pass: "ab29ga61" },
+      { dni: "50293461", apellido: "Gaspar",           nombre: "Abigail",            usuario: "gasparedgar540@gmail.com",            pass: "ga6220ab" },
+      { dni: "49584626", apellido: "GONZALEZ",         nombre: "MATEO JOAQUIN",      usuario: "mateogonzalez4626@mendoza.edu.ar",     pass: "ma58go26" },
+      { dni: "49584626", apellido: "Gonzalez",         nombre: "Mateo",              usuario: "mg4687164@gmail.com",                 pass: "go2541ma" },
+      { dni: "49922267", apellido: "LLANOS",           nombre: "HECTOR",             usuario: "hllanos4992@mendoza.edu.ar",           pass: "he49ll92" },
+      { dni: "49922267", apellido: "LLANOS",           nombre: "HECTOR NAHUEL",      usuario: "hectorllanos2267@mendoza.edu.ar",      pass: "he92ll67" },
+      { dni: "49922267", apellido: "Llanos",           nombre: "Nahuel",             usuario: "hectorllanosnahuel267@gmail.com",      pass: "ll2453na" },
+      { dni: "49912182", apellido: "LLUSCO",           nombre: "AGUSTINA",           usuario: "allusco4991@mendoza.edu.ar",           pass: "ag49ll91" },
+      { dni: "49912182", apellido: "LLUSCO AGUILERA",  nombre: "AGUSTINA EVELYN",    usuario: "agustinallusco2182@mendoza.edu.ar",    pass: "ag91ll82" },
+      { dni: "49912182", apellido: "Llusco",           nombre: "Agustina",           usuario: "agustinallusco2182@gmail.com",         pass: "ll4813ag" },
+      { dni: "49922247", apellido: "PARAVISINI",       nombre: "SANTIAGO",           usuario: "sparavisini4992@mendoza.edu.ar",       pass: "sa49pa92" },
+      { dni: "49922247", apellido: "PARAVISINI",       nombre: "SANTIAGO ÁNGEL",     usuario: "santiagoparavisini2247@mendoza.edu.ar",pass: "sa92pa47" },
+      { dni: "49922230", apellido: "PARICAGUA",        nombre: "ABIGAIL",            usuario: "aparicagua4992@mendoza.edu.ar",        pass: "ab49pa92" },
+      { dni: "49922230", apellido: "PARICAGUA MAMANI", nombre: "ABIGAIL NOEMI",      usuario: "abigailparicagua2230@mendoza.edu.ar",  pass: "ab92pa30" },
+      { dni: "49922230", apellido: "Paricagua",        nombre: "Abigail",            usuario: "abigail.420.mamani@gmail.com",         pass: "pa7124ab" },
+      { dni: "49582619", apellido: "RAMIREZ",          nombre: "GERÓNIMO",           usuario: "gramirez4958@mendoza.edu.ar",          pass: "ge49ra58" },
+      { dni: "49582619", apellido: "RAMIREZ",          nombre: "GERÓNIMO SAMUEL",    usuario: "geronimoramirez2619@mendoza.edu.ar",   pass: "ge58ra19" },
+      { dni: "49582619", apellido: "Ramirez",          nombre: "Gerónimo",           usuario: "geronimoramirez264@gmail.com",         pass: "ra2614ge" },
+      { dni: "48812389", apellido: "SENDRA",           nombre: "CAREN",              usuario: "csendra4881@mendoza.edu.ar",           pass: "ca48se81" },
+      { dni: "48812389", apellido: "SENDRA",           nombre: "CAREN JANET",        usuario: "carensendra2389@mendoza.edu.ar",       pass: "ca81se89" },
+      { dni: "48812389", apellido: "Sendra",           nombre: "Caren",              usuario: "carensendra@gmail.com",               pass: "se3719ca" },
+      { dni: "50173308", apellido: "TAPIA",            nombre: "GUSTAVO",            usuario: "gtapia5017@mendoza.edu.ar",            pass: "gu50ta17" },
+      { dni: "50173308", apellido: "TAPIA",            nombre: "GUSTAVO YOEL",       usuario: "gustavotapia3308@mendoza.edu.ar",      pass: "gu17ta08" },
+      { dni: "50173308", apellido: "Tapia",            nombre: "Yoel",               usuario: "yoyel722@gmail.com",                  pass: "ta6499yo" },
+      { dni: "49912161", apellido: "TAPIA SEPULVEDA",  nombre: "LUNA YAEL",          usuario: "lunatapia2161@mendoza.edu.ar",         pass: "lu91ta61" },
+      { dni: "49912161", apellido: "Tapia",            nombre: "Luna",               usuario: "lunayaeltapiasepulveda@gmail.com",     pass: "ta5628lu" },
+      { dni: "49633858", apellido: "VELIZ",            nombre: "FRANCO",             usuario: "fveliz4963@mendoza.edu.ar",            pass: "fr49ve63" },
+      { dni: "49633858", apellido: "VELIZ",            nombre: "FRANCO DANIEL",      usuario: "francoveliz3858@mendoza.edu.ar",       pass: "fr63ve58" },
+      { dni: "49633858", apellido: "Véliz",            nombre: "Franco",             usuario: "saraviaf061@gmail.com",               pass: "vé9935fr" },
+      { dni: "49633846", apellido: "VILLCA",           nombre: "ANAHI",              usuario: "avillca4963@mendoza.edu.ar",           pass: "an49vi63" },
+      { dni: "49633846", apellido: "VILLCA MENDEZ",    nombre: "ANAHI FERNANDA",     usuario: "anahivillca3846@mendoza.edu.ar",       pass: "an63vi46" },
+      { dni: "49633846", apellido: "Villca",           nombre: "Anahi",              usuario: "anahivillca2009@gmail.com",            pass: "vi6663an" }
+    ];
+
+    function normalizar(str) {
+      return str.trim().toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function buscar() {
+      const dni      = document.getElementById('dniInput').value.trim();
+      const apellido = normalizar(document.getElementById('apellidoInput').value);
+      const error    = document.getElementById('errorMsg');
+      const section  = document.getElementById('resultSection');
+
+      error.className = 'error-msg';
+      section.className = 'result-section';
+
+      if (!dni || !apellido) {
+        error.textContent = 'Por favor completá ambos campos.';
+        error.className = 'error-msg show';
+        return;
+      }
+
+      // Find all entries matching this DNI
+      const matches = alumnos.filter(a => a.dni === dni);
+
+      if (matches.length === 0) {
+        error.textContent = 'No se encontraron datos. Verificá el DNI ingresado.';
+        error.className = 'error-msg show';
+        return;
+      }
+
+      // Verify that the apellido matches at least one entry for this DNI
+      const apellidoMatch = matches.find(a => normalizar(a.apellido).includes(apellido) || apellido.includes(normalizar(a.apellido).split(' ')[0]));
+      if (!apellidoMatch) {
+        error.textContent = 'El apellido no coincide con el DNI ingresado.';
+        error.className = 'error-msg show';
+        return;
+      }
+
+      // Show result - use the full name from the longest apellido entry
+      const mainEntry = matches.reduce((a, b) => a.apellido.length >= b.apellido.length ? a : b);
+      document.getElementById('alumnoNombre').textContent = mainEntry.apellido + ', ' + mainEntry.nombre;
+
+      // Build credential blocks
+      const container = document.getElementById('credentialsContainer');
+      container.innerHTML = '';
+
+      // Group by email type
+      const mendoza = matches.filter(a => a.usuario.includes('@mendoza.edu.ar'));
+      const gmail   = matches.filter(a => a.usuario.includes('@gmail.com'));
+
+      if (mendoza.length > 0) {
+        container.appendChild(buildBlock('Cuentas @mendoza.edu.ar', mendoza));
+      }
+      if (gmail.length > 0) {
+        container.appendChild(buildBlock('Cuenta @gmail.com', gmail));
+      }
+
+      section.className = 'result-section show';
+    }
+
+    function buildBlock(title, entries) {
+      const block = document.createElement('div');
+      block.className = 'credential-block';
+      block.innerHTML = `<div class="credential-block-title">${title}</div>`;
+
+      entries.forEach((entry, i) => {
+        if (entries.length > 1) {
+          const sep = document.createElement('div');
+          sep.style.cssText = 'color:rgba(255,255,255,0.3);font-size:0.7rem;margin-bottom:8px;margin-top:' + (i > 0 ? '16px' : '0');
+          sep.textContent = entry.nombre;
+          block.appendChild(sep);
+        }
+        block.appendChild(makeCredentialItem('Usuario', entry.usuario));
+        block.appendChild(makeCredentialItem('Contraseña', entry.pass));
+      });
+      return block;
+    }
+
+    function makeCredentialItem(label, value) {
+      const item = document.createElement('div');
+      item.className = 'credential-item';
+      const uid = 'cv_' + Math.random().toString(36).slice(2);
+      item.innerHTML = `
+        <div class="credential-label">${label}</div>
+        <div class="credential-value">
+          <span id="${uid}">${value}</span>
+          <button class="copy-btn" onclick="copiar('${uid}', this)">Copiar</button>
+        </div>`;
+      return item;
+    }
+
+    function copiar(id, btn) {
+      const val = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(val).then(() => {
+        btn.textContent = '¡Copiado!';
+        setTimeout(() => btn.textContent = 'Copiar', 2000);
+      });
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') buscar();
+    });
+  </script>
+</body>
+</html>

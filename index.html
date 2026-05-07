@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consulta de Credenciales - 5to 1ra</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .header h1 {
+      color: #fff;
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .header p {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.9rem;
+      margin-top: 6px;
+    }
+
+    .search-card {
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 32px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    input::placeholder { color: rgba(255,255,255,0.3); }
+
+    input:focus {
+      border-color: #7c6aff;
+      background: rgba(124, 106, 255, 0.1);
+      box-shadow: 0 0 0 3px rgba(124, 106, 255, 0.2);
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #7c6aff, #a855f7);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 8px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(124, 106, 255, 0.5);
+    }
+
+    button:active { transform: translateY(0); }
+
+    .result-card {
+      margin-top: 24px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(124, 106, 255, 0.4);
+      border-radius: 20px;
+      padding: 28px;
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-card.show { display: block; }
+
+    .alumno-name {
+      color: #a78bfa;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .alumno-fullname {
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .credential-item {
+      margin-bottom: 18px;
+    }
+
+    .credential-label {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
+    }
+
+    .credential-value {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 12px 16px;
+    }
+
+    .credential-value span {
+      color: #fff;
+      font-size: 0.95rem;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.5px;
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      color: #7c6aff;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      font-size: 0.75rem;
+      font-weight: 700;
+      width: auto;
+      margin-top: 0;
+    }
+
+    .copy-btn:hover {
+      background: rgba(124, 106, 255, 0.2);
+      transform: none;
+      box-shadow: none;
+    }
+
+    .error-msg {
+      margin-top: 16px;
+      padding: 14px 18px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 12px;
+      color: #fca5a5;
+      font-size: 0.9rem;
+      text-align: center;
+      display: none;
+    }
+
+    .error-msg.show { display: block; animation: fadeIn 0.3s ease; }
+
+    .badge {
+      display: inline-block;
+      background: rgba(124, 106, 255, 0.2);
+      color: #a78bfa;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Portal FutureFab <span class="badge">5to 1ra</span></h1>
+      <p>Ingresá tu DNI y apellido para ver tus credenciales</p>
+    </div>
+
+    <div class="search-card">
+      <div class="form-group">
+        <label>DNI</label>
+        <input type="text" id="dniInput" placeholder="Ej: 49183828" maxlength="10" inputmode="numeric">
+      </div>
+      <div class="form-group">
+        <label>Apellido</label>
+        <input type="text" id="apellidoInput" placeholder="Ej: Alcazar" maxlength="50">
+      </div>
+      <button onclick="buscar()">Buscar mis credenciales</button>
+
+      <div class="error-msg" id="errorMsg">
+        No se encontraron datos. Verificá el DNI y apellido ingresados.
+      </div>
+
+      <div class="result-card" id="resultCard">
+        <div class="alumno-name">Alumno</div>
+        <div class="alumno-fullname" id="alumnoNombre"></div>
+
+        <div class="credential-item">
+          <div class="credential-label">Usuario FF</div>
+          <div class="credential-value">
+            <span id="usuarioVal"></span>
+            <button class="copy-btn" onclick="copiar('usuarioVal', this)">Copiar</button>
+          </div>
+        </div>
+
+        <div class="credential-item">
+          <div class="credential-label">Contraseña FF</div>
+          <div class="credential-value">
+            <span id="passVal"></span>
+            <button class="copy-btn" onclick="copiar('passVal', this)">Copiar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const alumnos = [
+      { dni: "49183828", apellido: "Alcazar",  nombre: "Carla",    usuario: "alcazarcarla506@gmail.com",       pass: "al6891ca" },
+      { dni: "49181307", apellido: "Ayarde",   nombre: "Tobias",   usuario: "ayardetobiasyoel@gmail.com",      pass: "ay1367to" },
+      { dni: "49082427", apellido: "Badiali",  nombre: "Tomás",    usuario: "tomasbadialinunez@gmail.com",     pass: "ba4629to" },
+      { dni: "95081490", apellido: "Choque",   nombre: "Aracely",  usuario: "aracelychoque1208@gmail.com",     pass: "ch2637ar" },
+      { dni: "49582514", apellido: "Costa",    nombre: "Bruno",    usuario: "brunoagustincosta.09@gmail.com",  pass: "co4362br" },
+      { dni: "49582542", apellido: "Ferreyra", nombre: "Damaris",  usuario: "ferreyradami38@gmail.com",        pass: "fe9489da" },
+      { dni: "49183803", apellido: "Galván",   nombre: "Joaquin",  usuario: "joaquin2008gh@gmail.com",         pass: "ga4748jo" },
+      { dni: "49082484", apellido: "Jurado",   nombre: "Luz",      usuario: "gambarteluz826@gmail.com",        pass: "ju5797lu" },
+      { dni: "49183801", apellido: "Lezcano",  nombre: "Milagros", usuario: "lezcanomilagros011@gmail.com",    pass: "le5483mi" },
+      { dni: "49130594", apellido: "Loza",     nombre: "Morena",   usuario: "morenalozajurado49@gmail.com",    pass: "lo8191mo" },
+      { dni: "49334854", apellido: "Orueta",   nombre: "Jesus",    usuario: "jesusorueta04@gmail.com",         pass: "or3198je" },
+      { dni: "49334840", apellido: "Pardo",    nombre: "Julieta",  usuario: "julietapardo2000@gmail.com",      pass: "pa7308ju" },
+      { dni: "49183872", apellido: "Romero",   nombre: "Morena",   usuario: "yamilemorena09@gmail.com",        pass: "ro5116mo" },
+      { dni: "49582505", apellido: "Romero",   nombre: "William",  usuario: "rricardo1709@gmail.com",          pass: "ro4116wi" },
+      { dni: "47725439", apellido: "Vilche",   nombre: "Genaro",   usuario: "gvilche9@gmail.com",              pass: "vi8831ge" },
+      { dni: "48895479", apellido: "Villca",   nombre: "Melisa",   usuario: "melisavillca2008@gmail.com",      pass: "vi8716me" }
+    ];
+
+    function normalizar(str) {
+      return str.trim().toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function buscar() {
+      const dni      = document.getElementById('dniInput').value.trim();
+      const apellido = normalizar(document.getElementById('apellidoInput').value);
+      const error    = document.getElementById('errorMsg');
+      const card     = document.getElementById('resultCard');
+
+      error.classList.remove('show');
+      card.classList.remove('show');
+
+      if (!dni || !apellido) {
+        error.textContent = 'Por favor completá ambos campos.';
+        error.classList.add('show');
+        return;
+      }
+
+      const alumno = alumnos.find(a =>
+        a.dni === dni && normalizar(a.apellido) === apellido
+      );
+
+      if (!alumno) {
+        error.textContent = 'No se encontraron datos. Verificá el DNI y apellido ingresados.';
+        error.classList.add('show');
+        return;
+      }
+
+      document.getElementById('alumnoNombre').textContent = alumno.apellido + ', ' + alumno.nombre;
+      document.getElementById('usuarioVal').textContent   = alumno.usuario;
+      document.getElementById('passVal').textContent      = alumno.pass;
+      card.classList.add('show');
+    }
+
+    function copiar(id, btn) {
+      const val = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(val).then(() => {
+        btn.textContent = '¡Copiado!';
+        setTimeout(() => btn.textContent = 'Copiar', 2000);
+      });
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') buscar();
+    });
+  </script>
+</body>
+</html>
